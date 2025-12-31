@@ -1,0 +1,51 @@
+export const vi = {
+    common: {
+        loading: "Đang tải...",
+        close: "Đóng",
+        save: "Lưu",
+        cancel: "Hủy",
+        send: "Gửi",
+        search: "Tìm kiếm",
+        settings: "Cài đặt",
+        profile: "Hồ sơ",
+        friends: "Bạn bè",
+        chat: "Trò chuyện",
+    },
+    auth: {
+        login_title: "Chào mừng đến VibeMap",
+        login_subtitle: "Kết nối với bạn bè theo thời gian thực.",
+        login_google: "Tiếp tục với Google",
+        logging_in: "Đang đăng nhập...",
+    },
+    map: {
+        active: "VibeMap Đang hoạt động",
+        friends_online: "Bạn bè trực tuyến",
+        you: "Bạn",
+    },
+    profile: {
+        title: "Chỉnh sửa hồ sơ",
+        display_name: "Tên hiển thị",
+        change_avatar: "Đổi ảnh đại diện",
+        uploading: "Đang tải lên...",
+        language: "Ngôn ngữ",
+        theme: "Giao diện",
+        light: "Sáng",
+        dark: "Tối",
+        system: "Hệ thống",
+        logout: "Đăng xuất",
+    },
+    friends: {
+        title: "Bạn bè",
+        add_by_email: "Thêm bạn bằng Email",
+        email_placeholder: "friend@example.com",
+        pending_requests: "Lời mời kết bạn",
+        my_friends: "Bạn bè của tôi",
+        no_friends: "Chưa có bạn bè. Hãy thêm ai đó!",
+        request_sent: "Đã gửi lời mời!",
+        failed: "Thất bại",
+    },
+    chat: {
+        placeholder: "Nhập tin nhắn...",
+        now: "Vừa xong",
+    }
+};

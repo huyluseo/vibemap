@@ -1,0 +1,51 @@
+export const en = {
+    common: {
+        loading: "Loading...",
+        close: "Close",
+        save: "Save",
+        cancel: "Cancel",
+        send: "Send",
+        search: "Search",
+        settings: "Settings",
+        profile: "Profile",
+        friends: "Friends",
+        chat: "Chat",
+    },
+    auth: {
+        login_title: "Welcome to VibeMap",
+        login_subtitle: "Connect with your friends in real-time.",
+        login_google: "Continue with Google",
+        logging_in: "Logging in...",
+    },
+    map: {
+        active: "VibeMap Active",
+        friends_online: "Friends Online",
+        you: "You",
+    },
+    profile: {
+        title: "Edit Profile",
+        display_name: "Display Name",
+        change_avatar: "Change Avatar",
+        uploading: "Uploading...",
+        language: "Language",
+        theme: "Theme",
+        light: "Light",
+        dark: "Dark",
+        system: "System",
+        logout: "Logout",
+    },
+    friends: {
+        title: "Friends",
+        add_by_email: "Add Friend by Email",
+        email_placeholder: "friend@example.com",
+        pending_requests: "Pending Requests",
+        my_friends: "My Friends",
+        no_friends: "No friends yet. Add someone!",
+        request_sent: "Request sent!",
+        failed: "Failed",
+    },
+    chat: {
+        placeholder: "Type a message...",
+        now: "Just now",
+    }
+};

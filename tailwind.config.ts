@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+    darkMode: "class",
     content: [
         "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
         "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,15 +10,33 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
+                background: "hsl(var(--background))",
+                foreground: "hsl(var(--foreground))",
+                primary: {
+                    DEFAULT: "hsl(var(--primary))",
+                    foreground: "hsl(var(--primary-foreground))",
+                },
+                muted: {
+                    DEFAULT: "hsl(var(--muted))",
+                    foreground: "hsl(var(--muted-foreground))",
+                },
+                border: "hsl(var(--border))",
+                input: "hsl(var(--input))",
+                card: {
+                    DEFAULT: "hsl(var(--card))",
+                    foreground: "hsl(var(--card-foreground))",
+                },
+
+                // Legacy support maps to new variables where appropriate
                 vibe: {
-                    black: "#121212",
-                    dark: "#1E1E1E",
-                    primary: "#6C63FF", // Sovereign Purple
-                    accent: "#00E5FF",  // Neon Cyan
+                    black: "hsl(var(--background))", // Map to background
+                    dark: "hsl(var(--card))",       // Map to card
+                    primary: "hsl(var(--primary))",
+                    accent: "#00E5FF",
                     error: "#FF4D4D",
                     text: {
-                        primary: "#FFFFFF",
-                        secondary: "#B3B3B3",
+                        primary: "hsl(var(--foreground))",
+                        secondary: "hsl(var(--muted-foreground))",
                     }
                 },
             },

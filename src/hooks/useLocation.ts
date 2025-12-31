@@ -36,7 +36,15 @@ export function useLocation(user: FirebaseUser | null) {
                     status: 'offline'
                 });
             },
-            (error) => console.error("Error getting location", error),
+            (error) => {
+                console.error("Error getting location:", {
+                    code: error.code,
+                    message: error.message,
+                    PERMISSION_DENIED: error.PERMISSION_DENIED,
+                    POSITION_UNAVAILABLE: error.POSITION_UNAVAILABLE,
+                    TIMEOUT: error.TIMEOUT
+                });
+            },
             { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
         );
 

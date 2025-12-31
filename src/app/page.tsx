@@ -9,10 +9,15 @@ import MapView from "@/components/Map/MapView";
 import ChatWindow from "@/components/Chat/ChatWindow";
 import ProfileModal from "@/components/Profile/ProfileModal";
 import FriendManager from "@/components/Friends/FriendManager";
-import { Loader2, Settings, Users } from "lucide-react";
+import { Loader2, Settings, Users, X } from "lucide-react";
+import { useLanguage } from "@/hooks/useLanguage";
+import { useTheme } from "next-themes";
 
 export default function Home() {
   const { user, loading } = useAuth();
+  const { t } = useLanguage();
+  const { resolvedTheme } = useTheme();
+  const bgColor = resolvedTheme === 'light' ? 'bg-white' : 'bg-[#1E1E1E]';
 
   // Start tracking location if user is logged in
   const { location } = useLocation(user);
@@ -23,7 +28,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-vibe-black text-vibe-primary">
+      <main className="flex min-h-screen items-center justify-center bg-background text-primary">
         <Loader2 className="w-10 h-10 animate-spin" />
       </main>
     );
@@ -34,7 +39,7 @@ export default function Home() {
   }
 
   return (
-    <main className="flex h-[100dvh] flex-col bg-vibe-black relative overflow-hidden">
+    <main className="flex h-[100dvh] flex-col bg-background relative overflow-hidden">
       <MapView
         userLocation={location}
         onChatStart={(friend) => setActiveChat(friend)}
@@ -46,8 +51,8 @@ export default function Home() {
         {/* Profile Button */}
         <button
           onClick={() => setIsProfileOpen(true)}
-          className="bg-black/40 backdrop-blur-md p-3 rounded-full border border-white/10 text-white/80 hover:text-white hover:bg-black/60 transition-all shadow-lg"
-          title="Profile"
+          className={`${bgColor} p-3 rounded-full border border-neutral-200 dark:border-neutral-800 text-foreground/80 hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all shadow-lg`}
+          title={t('common.profile')}
         >
           <Settings size={24} />
         </button>
@@ -55,8 +60,8 @@ export default function Home() {
         {/* Friends Button */}
         <button
           onClick={() => setIsFriendsOpen(true)}
-          className="bg-black/40 backdrop-blur-md p-3 rounded-full border border-white/10 text-white/80 hover:text-white hover:bg-black/60 transition-all shadow-lg"
-          title="Friends"
+          className={`${bgColor} p-3 rounded-full border border-neutral-200 dark:border-neutral-800 text-foreground/80 hover:text-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-all shadow-lg`}
+          title={t('common.friends')}
         >
           <Users size={24} />
         </button>
@@ -73,9 +78,9 @@ export default function Home() {
           <div className="relative w-full max-w-md">
             <button
               onClick={() => setIsFriendsOpen(false)}
-              className="absolute -top-12 right-0 p-2 text-white/50 hover:text-white"
+              className="absolute -top-12 right-0 p-2 text-white/50 hover:text-white flex items-center gap-1"
             >
-              Close
+              <X size={20} /> {t('common.close')}
             </button>
             <FriendManager
               onChatStart={(friend) => {

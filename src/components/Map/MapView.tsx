@@ -5,6 +5,8 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { User, Battery, Zap, MessageCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFriends } from "@/hooks/useFriends";
+import { useLanguage } from "@/hooks/useLanguage";
+import { useTheme } from "next-themes";
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
@@ -17,6 +19,8 @@ interface MapViewProps {
 export default function MapView({ userLocation, onChatStart, onOpenFriends }: MapViewProps) {
     const { user } = useAuth();
     const { friends } = useFriends(user);
+    const { t } = useLanguage();
+    const { theme } = useTheme();
     const [hasCentered, setHasCentered] = useState(false);
 
     const [viewState, setViewState] = useState({
@@ -25,7 +29,7 @@ export default function MapView({ userLocation, onChatStart, onOpenFriends }: Ma
         zoom: 14,
     });
 
-    // Auto-center on user location when loaded
+    // Auto-center
     useEffect(() => {
         if (userLocation && !hasCentered) {
             setViewState(prev => ({
@@ -38,10 +42,16 @@ export default function MapView({ userLocation, onChatStart, onOpenFriends }: Ma
         }
     }, [userLocation, hasCentered]);
 
+    // Handle Map Style based on Theme
+    const { resolvedTheme } = useTheme();
+    const mapStyle = resolvedTheme === 'light'
+        ? "mapbox://styles/mapbox/streets-v12"
+        : "mapbox://styles/mapbox/dark-v11";
+
     return (
-        <div className="w-full h-screen relative bg-vibe-black">
+        <div className="w-full h-full relative bg-background">
             {!MAPBOX_TOKEN ? (
-                <div className="flex items-center justify-center h-full text-vibe-error">
+                <div className="flex items-center justify-center h-full text-destructive">
                     Missing Mapbox Token in .env.local
                 </div>
             ) : (
@@ -49,11 +59,8 @@ export default function MapView({ userLocation, onChatStart, onOpenFriends }: Ma
                     {...viewState}
                     onMove={(evt) => setViewState(evt.viewState)}
                     style={{ width: "100%", height: "100%" }}
-                    mapStyle="mapbox://styles/mapbox/dark-v11"
+                    mapStyle={mapStyle}
                     mapboxAccessToken={MAPBOX_TOKEN}
-                    onClick={() => {
-                        // Optional: Clear selection if we implement manual selection
-                    }}
                 >
                     <GeolocateControl position="top-right" />
                     <NavigationControl position="top-right" />
@@ -62,20 +69,20 @@ export default function MapView({ userLocation, onChatStart, onOpenFriends }: Ma
                     {user && userLocation && (
                         <Marker longitude={userLocation.lng} latitude={userLocation.lat} anchor="bottom">
                             <div className="relative group flex flex-col items-center">
-                                {/* Pulse Effect for Current User */}
-                                <div className="absolute -inset-4 bg-vibe-primary/20 rounded-full animate-ping pointer-events-none" />
+                                {/* Pulse Effect */}
+                                <div className="absolute -inset-4 bg-primary/20 rounded-full animate-ping pointer-events-none" />
 
                                 {/* Avatar Circle */}
-                                <div className="w-12 h-12 rounded-full border-2 border-vibe-primary bg-vibe-dark/90 backdrop-blur-md flex items-center justify-center shadow-[0_0_20px_rgba(0,255,102,0.6)] overflow-hidden z-10 relative">
+                                <div className="w-12 h-12 rounded-full border-2 border-primary bg-card/90 backdrop-blur-md flex items-center justify-center shadow-lg overflow-hidden z-10 relative">
                                     {user.photoURL ? (
                                         <img src={user.photoURL} alt="Me" className="w-full h-full object-cover" />
                                     ) : (
-                                        <User className="text-vibe-primary w-6 h-6" />
+                                        <User className="text-primary w-6 h-6" />
                                     )}
                                 </div>
 
-                                <div className="absolute -bottom-6 text-xs bg-vibe-primary/90 text-black font-bold px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
-                                    You
+                                <div className="absolute -bottom-6 text-xs bg-primary/90 text-primary-foreground font-bold px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
+                                    {t('map.you')}
                                 </div>
                             </div>
                         </Marker>
@@ -99,32 +106,32 @@ export default function MapView({ userLocation, onChatStart, onOpenFriends }: Ma
                                 }}
                             >
                                 <div className="relative group flex flex-col items-center cursor-pointer transition-transform hover:scale-110">
-                                    {/* Status Indicator (Online/Offline) */}
-                                    <div className={`w-3 h-3 rounded-full border-2 border-vibe-black mb-1 ${friend.status === 'online' ? 'bg-green-500' : 'bg-gray-500'}`} />
+                                    {/* Status */}
+                                    <div className={`w-3 h-3 rounded-full border-2 border-background mb-1 ${friend.status === 'online' ? 'bg-green-500' : 'bg-muted-foreground'}`} />
 
-                                    {/* Avatar Circle */}
-                                    <div className="w-10 h-10 rounded-full border-2 border-vibe-accent bg-vibe-dark/80 backdrop-blur-md flex items-center justify-center shadow-[0_0_15px_rgba(0,229,255,0.5)] overflow-hidden">
+                                    {/* Avatar */}
+                                    <div className="w-10 h-10 rounded-full border-2 border-primary/50 bg-card/80 backdrop-blur-md flex items-center justify-center shadow-lg overflow-hidden">
                                         {friend.photoURL ? (
                                             <img src={friend.photoURL} alt={friend.name} className="w-full h-full object-cover" />
                                         ) : (
-                                            <User className="text-white w-6 h-6" />
+                                            <User className="text-foreground w-6 h-6" />
                                         )}
                                     </div>
 
-                                    {/* Chat Badge (Hover) */}
-                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 rounded-full p-2 z-20 backdrop-blur-sm">
-                                        <MessageCircle className="w-5 h-5 text-vibe-primary" />
+                                    {/* Chat Badge */}
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-background/60 rounded-full p-2 z-20 backdrop-blur-sm">
+                                        <MessageCircle className="w-5 h-5 text-primary" />
                                     </div>
 
-                                    {/* Battery Indicator (Mini) */}
+                                    {/* Battery */}
                                     {friend.battery !== undefined && (
-                                        <div className="absolute -top-4 right-[-10px] bg-black/80 rounded px-1 flex items-center gap-0.5 border border-white/20">
-                                            <span className={`text-[10px] ${friend.battery < 20 ? 'text-vibe-error' : 'text-vibe-text-primary'}`}>{friend.battery}%</span>
+                                        <div className="absolute -top-4 right-[-10px] bg-background/80 rounded px-1 flex items-center gap-0.5 border border-border">
+                                            <span className={`text-[10px] ${friend.battery < 20 ? 'text-destructive' : 'text-foreground'}`}>{friend.battery}%</span>
                                             {friend.isCharging && <Zap className="w-2 h-2 text-yellow-400 fill-yellow-400" />}
                                         </div>
                                     )}
 
-                                    <div className="absolute -bottom-6 text-xs bg-black/80 text-white px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
+                                    <div className="absolute -bottom-6 text-xs bg-background/80 text-foreground px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
                                         {friend.name || "Friend"}
                                     </div>
                                 </div>
@@ -134,21 +141,21 @@ export default function MapView({ userLocation, onChatStart, onOpenFriends }: Ma
                 </Map>
             )}
 
-            {/* Bottom Overlay (Status) */}
+            {/* Bottom Overlay */}
             <div className="absolute bottom-8 left-0 right-0 flex justify-center pointer-events-none pb-[env(safe-area-inset-bottom)]">
                 <div
                     onClick={onOpenFriends}
-                    className="glass-panel px-6 py-3 rounded-full pointer-events-auto border border-white/10 bg-black/40 backdrop-blur-xl flex items-center gap-3 cursor-pointer hover:bg-black/60 transition-colors active:scale-95"
+                    className="glass-panel px-6 py-3 rounded-full pointer-events-auto border border-border bg-card/40 backdrop-blur-xl flex items-center gap-3 cursor-pointer hover:bg-card/60 transition-colors active:scale-95 shadow-lg"
                 >
                     <div className="flex items-center gap-2">
                         <span className="relative flex h-3 w-3">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vibe-primary opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-3 w-3 bg-vibe-primary"></span>
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
                         </span>
-                        <span className="text-vibe-text-primary text-sm font-medium">VibeMap Active</span>
+                        <span className="text-foreground text-sm font-medium">{t('map.active')}</span>
                     </div>
-                    <div className="h-4 w-[1px] bg-white/20"></div>
-                    <span className="text-vibe-text-secondary text-sm">{friends.length} Friends Online</span>
+                    <div className="h-4 w-[1px] bg-border"></div>
+                    <span className="text-muted-foreground text-sm">{friends.length} {t('map.friends_online')}</span>
                 </div>
             </div>
         </div>

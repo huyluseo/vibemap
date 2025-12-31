@@ -1,27 +1,72 @@
 @import "tailwindcss";
 
 :root {
-  --foreground-rgb: 255, 255, 255;
-  --background-start-rgb: 18, 18, 18;
-  --background-end-rgb: 30, 30, 30;
+  /* Light Mode Variables (HSL) */
+  --background: 0 0% 100%;
+  /* White */
+  --foreground: 0 0% 9%;
+  /* Neutral 900 */
+
+  --primary: 243 100% 69%;
+  /* #6C63FF - HSL approx */
+  --primary-foreground: 0 0% 100%;
+
+  --muted: 0 0% 96%;
+  /* Neutral 100 */
+  --muted-foreground: 0 0% 45%;
+  /* Neutral 500 */
+
+  --border: 0 0% 90%;
+  /* Neutral 200 */
+  --input: 0 0% 90%;
+
+  --card: 0 0% 100%;
+  /* White */
+  --card-foreground: 0 0% 9%;
+}
+
+.dark {
+  /* Dark Mode Variables (HSL) */
+  --background: 0 0% 7%;
+  /* #121212 approx */
+  --foreground: 0 0% 100%;
+
+  --primary: 243 100% 69%;
+  --primary-foreground: 0 0% 100%;
+
+  --muted: 0 0% 15%;
+  /* Neutral 800 */
+  --muted-foreground: 0 0% 64%;
+  /* Neutral 400 */
+
+  --border: 0 0% 15%;
+  --input: 0 0% 15%;
+
+  --card: 0 0% 12%;
+  /* #1E1E1E approx */
+  --card-foreground: 0 0% 100%;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
   min-height: 100vh;
-  /* Premium Dark Mode Font Smoothing */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Hide Scrollbar for cleaner UI */
+/* Hide Scrollbar */
 ::-webkit-scrollbar {
   width: 0px;
   background: transparent;
+}
+
+/* Custom Scrollbar for friend list if needed */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 }
