@@ -7,11 +7,14 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "VibeMap",
   description: "Stay connected regarding vibe.",
-  manifest: "/manifest.json",
+  manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "VibeMap",
+  },
+  icons: {
+    apple: "/apple-icon.png",
   },
 };
 

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -5,6 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
 import AuthScreen from "@/components/Auth/AuthScreen";
 import MapView from "@/components/Map/MapView";
+import ChatWindow from "@/components/Chat/ChatWindow";
 import ProfileModal from "@/components/Profile/ProfileModal";
 import FriendManager from "@/components/Friends/FriendManager";
 import { Loader2, Settings, Users } from "lucide-react";
@@ -17,6 +19,7 @@ export default function Home() {
   /* Profile Modal State */
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isFriendsOpen, setIsFriendsOpen] = useState(false);
+  const [activeChat, setActiveChat] = useState<{ uid: string; displayName: string; photoURL?: string } | null>(null);
 
   if (loading) {
     return (
@@ -31,8 +34,12 @@ export default function Home() {
   }
 
   return (
-    <main className="flex min-h-screen flex-col bg-vibe-black relative">
-      <MapView userLocation={location} />
+    <main className="flex h-[100dvh] flex-col bg-vibe-black relative overflow-hidden">
+      <MapView
+        userLocation={location}
+        onChatStart={(friend) => setActiveChat(friend)}
+        onOpenFriends={() => setIsFriendsOpen(true)}
+      />
 
       {/* Top Left Controls */}
       <div className="absolute top-4 left-4 z-10 flex flex-col gap-3">
@@ -70,9 +77,24 @@ export default function Home() {
             >
               Close
             </button>
-            <FriendManager />
+            <FriendManager
+              onChatStart={(friend) => {
+                setActiveChat(friend);
+                setIsFriendsOpen(false);
+              }}
+            />
           </div>
         </div>
+      )}
+
+      {/* Chat Window */}
+      {activeChat && (
+        <ChatWindow
+          user={user}
+          friendUid={activeChat.uid}
+          friendName={activeChat.displayName}
+          onClose={() => setActiveChat(null)}
+        />
       )}
     </main>
   );

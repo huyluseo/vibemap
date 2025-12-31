@@ -47,40 +47,28 @@ export function useFriendRequests(user: FirebaseUser | null) {
         setLoading(true);
 
         try {
-            // 1. Find user by email (This requires a way to lookup users by email. 
-            // primarily we should index users by email or have a lookup, but for now scan users - slow but MVP)
-            // Ideally we should have a `users_by_email` node. 
-            // For this MVP, we'll assuming we can find them in `users` node.
-
             const usersRef = ref(database, "users");
-            // Note: This is inefficient for large DBs, should use indexOn in rules
             const snapshot = await get(usersRef);
             const users = snapshot.val();
 
-            let foundUser: { uid: string; email?: string } | null = null;
+            interface UserData {
+                uid: string;
+                email?: string;
+                displayName?: string;
+                photoURL?: string;
+            }
+
+            let foundUser: UserData | null = null;
 
             if (users) {
-                // We need to match email usually from Auth, but we stored it in DB? 
-                // We didn't explicitly store email in DB in previous steps (only name/photo).
-                // Let's assume user.email is available in specific node OR we rely on a manual input for now.
-                // Wait, in previous `useFriends` we saw data only had lat/lng/status.
-                // We need to update `useAuth` or `ProfileModal` to ensure email is in DB or searched via Auth (admin sdk).
-                // Since we can't use Admin SDK here, we must rely on what's in 'users' path.
-                // I will assume for now we might fail if email isn't there. 
-                // Let's rely on exact email match if we stored it setting up, or just 'name'???
-                // Email is best. Let's update `ProfileModal` later to store email too. 
-                // For now, I'll search by iterating (MVP). 
-
-                // Actually, let's look at `useFriends.ts` again. The `VibeUser` interface didn't have email.
-                // I should ensure email is saved when user logs in or updates profile.
-
-                // For now, let's implementing the logic assuming `email` field exists on user node.
-
-                Object.entries(users).forEach(([uid, val]: [string, any]) => {
-                    if (val.email === email) {
-                        foundUser = { uid, ...val };
+                // Use for...of loop for better TS control flow analysis
+                for (const [uid, val] of Object.entries(users)) {
+                    const uVal = val as any;
+                    if (uVal.email === email) {
+                        foundUser = { uid, ...uVal };
+                        break; // Found, stop searching
                     }
-                });
+                }
             }
 
             if (!foundUser) {
@@ -88,12 +76,11 @@ export function useFriendRequests(user: FirebaseUser | null) {
                 return { success: false, error: "User not found" };
             }
 
+            // At this point foundUser is definitely UserData
             if (foundUser.uid === user.uid) {
                 setLoading(false);
                 return { success: false, error: "Cannot add yourself" };
             }
-
-            // Check if already friends or request sent - skipped for MVP brevity but critical for final
 
             // 2. Send Request
             const newReqRef = push(ref(database, "friend_requests"));
@@ -101,7 +88,7 @@ export function useFriendRequests(user: FirebaseUser | null) {
                 from: user.uid,
                 fromName: user.displayName || "Unknown",
                 fromPhoto: user.photoURL || "",
-                to: foundUser.uid,
+                to: foundUser.uid, // No assertion needed now theoretically
                 status: 'pending',
                 timestamp: Date.now()
             });
@@ -131,7 +118,6 @@ export function useFriendRequests(user: FirebaseUser | null) {
             const theirFriendRef = ref(database, `users/${fromUid}/friends/${user.uid}`);
             await update(ref(database, `users/${fromUid}/friends`), { [user.uid]: true });
 
-            // 4. Create chat room (optional here, but good for later)
         } catch (error) {
             console.error("Error accepting", error);
         }

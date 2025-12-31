@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from "react";
 import Map, { NavigationControl, Marker, GeolocateControl } from "react-map-gl/mapbox";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { User, Battery, Zap } from "lucide-react";
+import { User, Battery, Zap, MessageCircle } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFriends } from "@/hooks/useFriends";
 
@@ -9,9 +10,11 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 interface MapViewProps {
     userLocation: { lat: number; lng: number } | null;
+    onChatStart?: (friend: { uid: string; displayName: string; photoURL?: string }) => void;
+    onOpenFriends?: () => void;
 }
 
-export default function MapView({ userLocation }: MapViewProps) {
+export default function MapView({ userLocation, onChatStart, onOpenFriends }: MapViewProps) {
     const { user } = useAuth();
     const { friends } = useFriends(user);
     const [hasCentered, setHasCentered] = useState(false);
@@ -48,6 +51,9 @@ export default function MapView({ userLocation }: MapViewProps) {
                     style={{ width: "100%", height: "100%" }}
                     mapStyle="mapbox://styles/mapbox/dark-v11"
                     mapboxAccessToken={MAPBOX_TOKEN}
+                    onClick={() => {
+                        // Optional: Clear selection if we implement manual selection
+                    }}
                 >
                     <GeolocateControl position="top-right" />
                     <NavigationControl position="top-right" />
@@ -78,14 +84,36 @@ export default function MapView({ userLocation }: MapViewProps) {
                     {/* Friends Markers */}
                     {friends.map((friend) => (
                         friend.location && (
-                            <Marker key={friend.uid} longitude={friend.location.lng} latitude={friend.location.lat} anchor="bottom">
-                                <div className="relative group flex flex-col items-center">
+                            <Marker
+                                key={friend.uid}
+                                longitude={friend.location.lng}
+                                latitude={friend.location.lat}
+                                anchor="bottom"
+                                onClick={(e) => {
+                                    e.originalEvent.stopPropagation();
+                                    onChatStart?.({
+                                        uid: friend.uid,
+                                        displayName: friend.name || "Friend",
+                                        photoURL: friend.photoURL
+                                    });
+                                }}
+                            >
+                                <div className="relative group flex flex-col items-center cursor-pointer transition-transform hover:scale-110">
                                     {/* Status Indicator (Online/Offline) */}
                                     <div className={`w-3 h-3 rounded-full border-2 border-vibe-black mb-1 ${friend.status === 'online' ? 'bg-green-500' : 'bg-gray-500'}`} />
 
                                     {/* Avatar Circle */}
                                     <div className="w-10 h-10 rounded-full border-2 border-vibe-accent bg-vibe-dark/80 backdrop-blur-md flex items-center justify-center shadow-[0_0_15px_rgba(0,229,255,0.5)] overflow-hidden">
-                                        <User className="text-white w-6 h-6" />
+                                        {friend.photoURL ? (
+                                            <img src={friend.photoURL} alt={friend.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <User className="text-white w-6 h-6" />
+                                        )}
+                                    </div>
+
+                                    {/* Chat Badge (Hover) */}
+                                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 rounded-full p-2 z-20 backdrop-blur-sm">
+                                        <MessageCircle className="w-5 h-5 text-vibe-primary" />
                                     </div>
 
                                     {/* Battery Indicator (Mini) */}
@@ -107,8 +135,11 @@ export default function MapView({ userLocation }: MapViewProps) {
             )}
 
             {/* Bottom Overlay (Status) */}
-            <div className="absolute bottom-8 left-0 right-0 flex justify-center pointer-events-none">
-                <div className="glass-panel px-6 py-3 rounded-full pointer-events-auto border border-white/10 bg-black/40 backdrop-blur-xl flex items-center gap-3">
+            <div className="absolute bottom-8 left-0 right-0 flex justify-center pointer-events-none pb-[env(safe-area-inset-bottom)]">
+                <div
+                    onClick={onOpenFriends}
+                    className="glass-panel px-6 py-3 rounded-full pointer-events-auto border border-white/10 bg-black/40 backdrop-blur-xl flex items-center gap-3 cursor-pointer hover:bg-black/60 transition-colors active:scale-95"
+                >
                     <div className="flex items-center gap-2">
                         <span className="relative flex h-3 w-3">
                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-vibe-primary opacity-75"></span>

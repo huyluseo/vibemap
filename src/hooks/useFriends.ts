@@ -10,6 +10,7 @@ export interface VibeUser {
     battery?: number;
     isCharging?: boolean;
     name?: string; // If you save name in DB
+    photoURL?: string;
 }
 
 export function useFriends(currentUser: FirebaseUser | null) {

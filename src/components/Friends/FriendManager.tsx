@@ -3,9 +3,13 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useFriendRequests } from "@/hooks/useFriendRequests";
 import { useFriends } from "@/hooks/useFriends";
-import { User, Search, UserPlus, Check, X, Loader2 } from "lucide-react";
+import { User, Search, UserPlus, Check, X, Loader2, MessageCircle } from "lucide-react";
 
-export default function FriendManager() {
+interface FriendManagerProps {
+    onChatStart?: (friend: { uid: string; displayName: string; photoURL?: string }) => void;
+}
+
+export default function FriendManager({ onChatStart }: FriendManagerProps) {
     const { user } = useAuth();
     const { requests, sendRequest, acceptRequest, rejectRequest, loading: reqLoading } = useFriendRequests(user);
     const { friends } = useFriends(user);
@@ -26,12 +30,12 @@ export default function FriendManager() {
     };
 
     return (
-        <div className="bg-[#1A1A1A] w-full max-w-md rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+        <div className="bg-[#1A1A1A] w-full max-w-md rounded-2xl border border-white/10 shadow-2xl overflow-hidden flex flex-col max-h-[80vh] pb-[env(safe-area-inset-bottom)]">
             <div className="p-4 border-b border-white/5">
                 <h2 className="text-lg font-semibold text-white">Friends</h2>
             </div>
 
-            <div className="p-4 overflow-y-auto space-y-6">
+            <div className="p-4 overflow-y-auto space-y-6 custom-scrollbar">
 
                 {/* 1. Add Friend */}
                 <div className="space-y-3">
@@ -100,14 +104,32 @@ export default function FriendManager() {
                                     <div className="flex items-center gap-3">
                                         <div className="w-8 h-8 rounded-full bg-vibe-dark/50 overflow-hidden flex items-center justify-center border border-white/20 relative">
                                             {friend.status === 'online' && <div className="absolute top-0 right-0 w-2 h-2 bg-green-500 rounded-full border border-black" />}
-                                            {/* We need photoURL in VibeUser interface in useFriends, potentially needs update there too */}
-                                            <User className="w-4 h-4 text-white/50" />
+                                            {friend.photoURL ? (
+                                                <img src={friend.photoURL} alt={friend.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                <User className="w-4 h-4 text-white/50" />
+                                            )}
                                         </div>
                                         <div>
                                             <p className="text-sm font-medium text-white group-hover:text-vibe-primary transition-colors">{friend.name || "Unknown"}</p>
                                             <p className="text-[10px] text-white/50">{friend.status || 'offline'}</p>
                                         </div>
                                     </div>
+
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            onChatStart?.({
+                                                uid: friend.uid,
+                                                displayName: friend.name || "Friend",
+                                                photoURL: friend.photoURL
+                                            });
+                                        }}
+                                        className="p-2 bg-white/5 hover:bg-vibe-primary/20 hover:text-vibe-primary rounded-full transition-colors text-white/50"
+                                        title="Message"
+                                    >
+                                        <MessageCircle className="w-4 h-4" />
+                                    </button>
                                 </div>
                             ))}
                         </div>
