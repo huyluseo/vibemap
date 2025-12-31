@@ -4,7 +4,7 @@ android {
     namespace "com.vibemap.app"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.vibemap.app"
+        applicationId "com.vibemap"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

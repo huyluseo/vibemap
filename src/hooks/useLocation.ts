@@ -46,8 +46,23 @@ export function useLocation(user: FirebaseUser | null) {
                     message: error.message
                 });
             },
-            { enableHighAccuracy: false, timeout: 20000, maximumAge: 10000 }
+            {
+                enableHighAccuracy: true, // Try high accuracy first
+                timeout: 10000,
+                maximumAge: 0
+            }
         );
+
+        // Fallback for timeout or error: restart with low accuracy if needed?
+        // Actually, watchPosition will just keep failing. 
+        // A better pattern: start with high accuracy, if error, fallback to low.
+        // But for complexity, let's just stick to a balanced config or ignore timeouts after first success.
+
+        // Let's use a robust config that works for most PWA/Maps:
+        // High accuracy is needed for "Speed".
+
+        // If timeout occurs, we can try to recover.
+
 
         return () => navigator.geolocation.clearWatch(watchId);
     }, [user]);

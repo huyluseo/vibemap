@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "804656272344",
+    "firebase_url": "https://vibemap-94cb6-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "vibemap-94cb6",
+    "storage_bucket": "vibemap-94cb6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:804656272344:android:66a50416fdfc3de0be18ad",
+        "android_client_info": {
+          "package_name": "com.vibemap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNouI2K-CeEqGp7zpeVRawERQhbpjPMHc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
