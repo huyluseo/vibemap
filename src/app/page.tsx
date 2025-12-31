@@ -20,7 +20,7 @@ export default function Home() {
   const bgColor = resolvedTheme === 'light' ? 'bg-white' : 'bg-[#1E1E1E]';
 
   // Start tracking location if user is logged in
-  const { location } = useLocation(user);
+  const { location, speed } = useLocation(user);
   /* Profile Modal State */
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isFriendsOpen, setIsFriendsOpen] = useState(false);
@@ -42,6 +42,7 @@ export default function Home() {
     <main className="flex h-[100dvh] flex-col bg-background relative overflow-hidden">
       <MapView
         userLocation={location}
+        speed={speed}
         onChatStart={(friend) => setActiveChat(friend)}
         onOpenFriends={() => setIsFriendsOpen(true)}
       />

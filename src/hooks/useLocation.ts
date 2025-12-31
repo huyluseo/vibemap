@@ -5,6 +5,7 @@ import { ref, update, onDisconnect } from "firebase/database";
 
 export function useLocation(user: FirebaseUser | null) {
     const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+    const [speed, setSpeed] = useState<number | null>(null);
 
     // Sync Location to Firebase
     useEffect(() => {
@@ -17,8 +18,9 @@ export function useLocation(user: FirebaseUser | null) {
 
         const watchId = navigator.geolocation.watchPosition(
             (position) => {
-                const { latitude, longitude } = position.coords;
+                const { latitude, longitude, speed: rawSpeed } = position.coords;
                 setLocation({ lat: latitude, lng: longitude });
+                setSpeed(rawSpeed);
 
                 // Update Firebase
                 const userRef = ref(database, `users/${user.uid}`);
@@ -27,6 +29,7 @@ export function useLocation(user: FirebaseUser | null) {
                         lat: latitude,
                         lng: longitude
                     },
+                    speed: rawSpeed, // m/s
                     status: 'online',
                     lastUpdated: Date.now()
                 });
@@ -37,15 +40,13 @@ export function useLocation(user: FirebaseUser | null) {
                 });
             },
             (error) => {
-                console.error("Error getting location:", {
+                console.error("Error getting location:", error);
+                console.error("Error details:", {
                     code: error.code,
-                    message: error.message,
-                    PERMISSION_DENIED: error.PERMISSION_DENIED,
-                    POSITION_UNAVAILABLE: error.POSITION_UNAVAILABLE,
-                    TIMEOUT: error.TIMEOUT
+                    message: error.message
                 });
             },
-            { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 }
+            { enableHighAccuracy: false, timeout: 20000, maximumAge: 10000 }
         );
 
         return () => navigator.geolocation.clearWatch(watchId);
@@ -74,5 +75,5 @@ export function useLocation(user: FirebaseUser | null) {
         }
     }, [user]);
 
-    return { location };
+    return { location, speed };
 }

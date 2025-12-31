@@ -12,15 +12,16 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 interface MapViewProps {
     userLocation: { lat: number; lng: number } | null;
+    speed?: number | null;
     onChatStart?: (friend: { uid: string; displayName: string; photoURL?: string }) => void;
     onOpenFriends?: () => void;
 }
 
-export default function MapView({ userLocation, onChatStart, onOpenFriends }: MapViewProps) {
+export default function MapView({ userLocation, speed, onChatStart, onOpenFriends }: MapViewProps) {
     const { user } = useAuth();
     const { friends } = useFriends(user);
     const { t } = useLanguage();
-    const { theme } = useTheme();
+    const { resolvedTheme } = useTheme(); // Correctly use resolvedTheme
     const [hasCentered, setHasCentered] = useState(false);
 
     const [viewState, setViewState] = useState({
@@ -43,7 +44,6 @@ export default function MapView({ userLocation, onChatStart, onOpenFriends }: Ma
     }, [userLocation, hasCentered]);
 
     // Handle Map Style based on Theme
-    const { resolvedTheme } = useTheme();
     const mapStyle = resolvedTheme === 'light'
         ? "mapbox://styles/mapbox/streets-v12"
         : "mapbox://styles/mapbox/dark-v11";
@@ -61,8 +61,25 @@ export default function MapView({ userLocation, onChatStart, onOpenFriends }: Ma
                     style={{ width: "100%", height: "100%" }}
                     mapStyle={mapStyle}
                     mapboxAccessToken={MAPBOX_TOKEN}
+                    attributionControl={false}
                 >
-                    <GeolocateControl position="top-right" />
+                    <GeolocateControl
+                        position="top-right"
+                        trackUserLocation={true}
+                        positionOptions={{
+                            enableHighAccuracy: true,
+                            timeout: 5000,
+                            maximumAge: 10000
+                        }}
+                        onGeolocate={(e) => {
+                            setViewState(prev => ({
+                                ...prev,
+                                latitude: e.coords.latitude,
+                                longitude: e.coords.longitude,
+                                zoom: 15
+                            }));
+                        }}
+                    />
                     <NavigationControl position="top-right" />
 
                     {/* Current User Marker */}
@@ -86,6 +103,16 @@ export default function MapView({ userLocation, onChatStart, onOpenFriends }: Ma
                                 </div>
                             </div>
                         </Marker>
+                    )}
+
+                    {/* Active Speed Display */}
+                    {speed !== null && speed !== undefined && speed > 0 && (
+                        <div className="absolute top-4 right-16 md:right-20 bg-background/80 backdrop-blur-md border border-border px-3 py-1.5 rounded-full shadow-lg z-10 flex items-center gap-1.5">
+                            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                            <span className="text-sm font-bold tabular-nums">
+                                {(speed * 3.6).toFixed(1)} <span className="text-xs font-normal text-muted-foreground">km/h</span>
+                            </span>
+                        </div>
                     )}
 
                     {/* Friends Markers */}
@@ -130,6 +157,9 @@ export default function MapView({ userLocation, onChatStart, onOpenFriends }: Ma
                                             {friend.isCharging && <Zap className="w-2 h-2 text-yellow-400 fill-yellow-400" />}
                                         </div>
                                     )}
+
+                                    {/* Friend Speed (Optional - if we add retrieval) */}
+                                    {/* If we add speed to friend object later, render it here */}
 
                                     <div className="absolute -bottom-6 text-xs bg-background/80 text-foreground px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none">
                                         {friend.name || "Friend"}
