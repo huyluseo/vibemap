@@ -27,6 +27,7 @@ export const viewport: Viewport = {
 };
 
 import { Providers } from "@/components/Providers";
+import { BackgroundLocation } from "@/components/BackgroundLocation";
 
 export default function RootLayout({
   children,
@@ -36,7 +37,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <BackgroundLocation />
+          {children}
+        </Providers>
       </body>
     </html>
   );

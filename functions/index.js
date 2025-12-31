@@ -4,13 +4,16 @@ const admin = require("firebase-admin");
 admin.initializeApp();
 
 // 1. Notify on Friend Request
+// 1. Notify on Friend Request
 exports.onFriendRequest = functions.database
-    .ref("/friend_requests/{recipientId}/{senderId}")
+    .ref("/friend_requests/{requestId}")
     .onCreate(async (snapshot, context) => {
-        const { recipientId, senderId } = context.params;
         const requestData = snapshot.val();
 
-        if (requestData.status !== "pending") return null;
+        if (!requestData || requestData.status !== "pending") return null;
+
+        const recipientId = requestData.to;
+        const senderId = requestData.from;
 
         try {
             // Get Sender Profile
@@ -49,30 +52,29 @@ exports.onFriendRequest = functions.database
 
 // 2. Notify on New Chat Message
 exports.onChatMessage = functions.database
-    .ref("/chats/{chatId}/{messageId}")
+    .ref("/chats/{chatId}/messages/{messageId}")
     .onCreate(async (snapshot, context) => {
-        const { chatId } = context.params;
+        const { chatId, messageId } = context.params;
         const messageData = snapshot.val();
         const senderId = messageData.senderId;
         const text = messageData.text;
 
-        // Chat ID is usually composed of two UIDs sorted, or we need to look up participants.
-        // Assuming simple 1-on-1 chat where we need to find the "other" person.
-        // A better approach for this app structure: 
-        // Usually chatId = sort(uid1, uid2). So we can deduce the other person.
+        console.log(`Processing message for chat: ${chatId}, message: ${messageId}`);
 
-        // However, to be robust, let's assume we derive the recipient from the chatId if possible
-        // OR we simply look at the message structure if it contains recipientId (it usually doesn't).
-
-        // Let's parse the chatId to find the OTHER uid.
+        // Chat ID is usually composed of two UIDs sorted.
         const uids = chatId.split("_");
-        if (uids.length !== 2) return null; // Not a standard 1-v-1 chat format we used?
-
-        // Actually, in our Frontend implementation:
-        // const chatId = [user.uid, friend.uid].sort().join("_");
+        if (uids.length !== 2) {
+            console.log("Invalid chatId format:", chatId);
+            return null;
+        }
 
         const recipientId = uids.find(uid => uid !== senderId);
-        if (!recipientId) return null;
+        if (!recipientId) {
+            console.log("Could not determine recipient from chatId:", chatId, "sender:", senderId);
+            return null;
+        }
+
+        console.log(`Sender: ${senderId}, Recipient: ${recipientId}`);
 
         try {
             // Get Sender Name
@@ -85,9 +87,12 @@ exports.onChatMessage = functions.database
             const fcmToken = recipientSnapshot.val();
 
             if (!fcmToken) {
-                // console.log("No FCM token for user:", recipientId);
+                console.log("No FCM token found for user:", recipientId);
+                // We might want to handle this case better, effectively it means the user hasn't allowed notifications.
                 return null;
             }
+
+            console.log(`Found FCM token for ${recipientId}: ${fcmToken.substring(0, 10)}...`);
 
             const message = {
                 token: fcmToken,
@@ -103,7 +108,8 @@ exports.onChatMessage = functions.database
                 },
             };
 
-            await admin.messaging().send(message);
+            const response = await admin.messaging().send(message);
+            console.log("Successfully sent message:", response);
         } catch (error) {
             console.error("Error sending chat notification:", error);
         }

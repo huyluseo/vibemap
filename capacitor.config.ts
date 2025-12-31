@@ -4,11 +4,11 @@ const config: CapacitorConfig = {
   appId: 'com.vibemap.app',
   appName: 'VibeMap',
   webDir: 'out',
-  server: {
+  /* server: {
     url: 'https://vibemap.cloud',
     cleartext: true,
     androidScheme: 'https'
-  }
+  } */
 };
 
 export default config;
