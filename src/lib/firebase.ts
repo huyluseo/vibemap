@@ -22,3 +22,12 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const database = getDatabase(app);
 export const storage = getStorage(app);
+
+// Messaging only works in browser environment
+export const messaging = async () => {
+  if (typeof window !== "undefined") {
+    const { getMessaging } = await import("firebase/messaging");
+    return getMessaging(app);
+  }
+  return null;
+};
