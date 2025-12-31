@@ -14,11 +14,7 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// DEBUG: Check if key is loaded
-console.log("Firebase Config Check:", {
-  apiKey: firebaseConfig.apiKey ? `Loaded (${firebaseConfig.apiKey.substring(0, 5)}...)` : "MISSING",
-  projectId: firebaseConfig.projectId,
-});
+
 
 // Singleton pattern for Next.js (avoid re-initialization on hot reload)
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
