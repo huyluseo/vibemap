@@ -74,7 +74,8 @@ export function useNotifications(user: User | null) {
                                 id: new Date().getTime(),
                                 schedule: { at: new Date(Date.now() + 100) },
                                 extra: notification.data,
-                                channelId: 'vibemap_default' // Use the created channel
+                                channelId: 'vibemap_default', // Use the created channel
+                                smallIcon: 'ic_notification'
                             }]
                         });
                     });
