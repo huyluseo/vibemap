@@ -17,6 +17,7 @@ export function useAuth() {
                     const userRef = ref(database, `users/${currentUser.uid}`);
                     update(userRef, {
                         email: currentUser.email,
+                        displayName: currentUser.displayName,
                         lastLogin: Date.now()
                     });
                 });
