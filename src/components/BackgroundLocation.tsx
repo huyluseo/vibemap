@@ -32,8 +32,8 @@ export function BackgroundLocation() {
 
                 const watcherId = await BackgroundGeolocation.addWatcher(
                     {
-                        backgroundMessage: "Tracking active to share location with friends.",
-                        backgroundTitle: "VibeMap is running",
+                        backgroundMessage: "Đang chia sẻ vị trí để bạn bè tìm thấy nhau",
+                        backgroundTitle: "VibeMap đang chạy 📍",
                         requestPermissions: true,
                         stale: false,
                         distanceFilter: 50 // Battery Saver: Only update every 50 meters

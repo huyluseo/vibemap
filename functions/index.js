@@ -33,8 +33,8 @@ exports.onFriendRequest = functions.database
             const message = {
                 token: fcmToken,
                 notification: {
-                    title: "New Friend Request! 👋",
-                    body: `${senderName} wants to be friends with you.`,
+                    title: "👋 Bạn mới kìa!",
+                    body: `${senderName} vừa gửi lời mời kết bạn với cậu.`,
                 },
                 data: {
                     type: "friend_request",
