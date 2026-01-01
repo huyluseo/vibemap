@@ -4,6 +4,6 @@
     <string name="title_activity_main">VibeMap</string>
     <string name="package_name">com.vibemap</string>
     <string name="custom_url_scheme">com.vibemap</string>
-    <string name="capacitor_background_geolocation_notification_icon">drawable/ic_notification</string>
+    <string name="capacitor_background_geolocation_notification_icon">mipmap/ic_notification</string>
     <string name="capacitor_background_geolocation_notification_color">@color/colorAccent</string>
 </resources>
